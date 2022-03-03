@@ -1,0 +1,686 @@
+{% extends "base.html" %}
+
+{% block title %} Workorder #{{ workorder.id }} {% endblock %}
+
+{% block content %}
+  {% if workorder.archived %}
+    <div class="alert alert-danger">
+      This is an <b>archived</b> workorder.
+    </div>
+  {% endif %}
+  <div class="row mb-5">
+    <div class="col-xl-9">
+      <div class="row bg-light p-4">
+
+        <div class="mt-2 mb-3">
+          <h2 id="workorder-title" class="mb-4">
+            Workorder #{{ workorder.id }}
+            {% if not workorder.items and not workorder.paid %}
+              <a href="/workorder/delete/{{ workorder.id }}" id="delete" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+              {% endif %}
+            {% if workorder.paid %}
+              <span class="badge bg-success">Paid</span>
+              <button id="edit-paid-invoice" class="btn btn-sm btn-secondary">
+                  <i class="fa fa-edit"></i>
+                  Edit infos
+              </button>
+            {% endif %}
+          </h2>
+
+          <div id="client-editable-infos" class="mb-3 {% if workorder.paid %}readonly{% endif %}">
+            <h3>
+              {% if workorder.client %}
+                For : <span>{{ workorder.client.name() }}</span> <small class="text-muted">{{ workorder.client.phone }}</small>
+                <button id="change-client-btn"
+                        class="btn btn-outline-secondary btn-sm {% if workorder.paid %}readonly{% endif %}">
+                        <i class="fa fa-edit"></i> Change client
+                </button>
+                <a class="btn btn-outline-secondary btn-sm {% if workorder.paid %}readonly{% endif %}"
+                   href="/workorder/set_client/{{ workorder.id }}">
+                    <i class="fa fa-user-slash"></i> Direct sale (no client)
+                </a>
+              {% else %}
+                Direct sale
+                <button id="change-client-btn"
+                        class="btn btn-outline-secondary btn-sm {% if workorder.paid %}readonly{% endif %}">
+                    <i class="fa fa-user"></i> Set a client
+                </button>
+              {% endif %}
+            </h3>
+
+            <div id="select-new-client" class="input-group mb-3" style="display: none;">
+              <span class="input-group-text"><i class="fa fa-user"></i>&nbsp;Set new client</span>
+              <input id="change-client" type="text" class="form-control form-control-lg">
+            </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+
+                    $('#change-client-btn').click(function() {
+                        $('#change-client-btn').hide();
+                        $('#select-new-client').slideDown(300);
+                    });
+
+                    let workorder_id = {{workorder.id}};
+
+                    $('#change-client').typeahead({
+                        hint: true,
+                        highlight: true,
+                        minLength: 2
+                    }, {
+                        name: 'clients',
+                        source: function(query, syncResults, asyncResults) {
+                            $.get('/api/search/clients/?query=' + query, function(data) {
+                                asyncResults(data);
+                            });
+                        },
+                        limit: 10,
+                        display: (e) => e.first_name + ' ' + e.last_name,
+                        templates: {
+                            {% raw %}
+                            suggestion: Handlebars.compile(
+                                '<div><a class="list-group-item list-group-item-action" href="/workorder/set_client/' + workorder_id + '/{{id}}">' +
+                                '{{first_name}} {{last_name}}' +
+                                '<br>' +
+                                '<small class="text-muted">{{phone}}</small>' +
+                                '</a></div>'),
+                            {% endraw %}
+                            footer: '<div class="tt-suggestion">' +
+                                    '<a class="list-group-item list-group-item-action" href="/client/new/' + workorder_id + '">' +
+                                    '<i>New client</i>' +
+                                    '</a>' +
+                                    '</div>',
+                            notFound: '<div class="tt-suggestion">' +
+                                      '<a class="list-group-item list-group-item-action" href="/client/new/' + workorder_id + '">' +
+                                      '<i>New client</i>' +
+                                      '</a>' +
+                                      '</div>',
+                        }
+                    });
+                });
+            </script>
+          </div>
+        </div>
+
+        <div id="bike-editable-infos">
+          {% if last_bike %}
+            <div id="propose-use-last-bike" class="row mt-2 mb-4 {% if workorder.paid %}readonly{% endif %}">
+              <div class="col-8">
+                <button class="btn btn-sm btn-outline-primary"
+                        onclick="use_last_bike({{ last_bike | tojson | forceescape }});">
+                        Same bike as last time?
+                </button>
+                {{ last_bike.bike_description }} {% if last_bike.bike_serial_number %}#{{ last_bike.bike_serial_number }} {% endif %}
+              </div>
+            </div>
+          {% endif %}
+          <div class="row mb-4">
+            <div class="col-8">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa fa-bicycle"></i>&nbsp;Bike description</span>
+                <input id="bike_description" name="bike_description"
+                       type="text" class="form-control" autocomplete="off"
+                       placeholder="eg.: Red Nakamura"
+                       {% if workorder.paid %}readonly{% endif %}
+                       value="{{ workorder.bike_description }}">
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="input-group">
+                <span class="input-group-text"><attr title="Serial number"><i class="fa fa-barcode"></i> Serial</attr></span>
+                <input id="bike_serial_number" name="bike_serial_number"
+                       type="text" class="form-control" autocomplete="off"
+                       placeholder="eg.: 1234567"
+                       {% if workorder.paid %}readonly{% endif %}
+                       value="{{ workorder.bike_serial_number }}">
+              </div>
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa fa-calendar"></i>&nbsp;Calendar</span>
+                <input id="calendar_date" name="calendar_date"
+                       type="text" class="form-control" autocomplete="off"
+                       placeholder="eg.: Red Nakamura"
+                       {% if workorder.paid %}readonly{% endif %}
+                       value="{{ workorder.calendar_date }}" />
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa fa-folder-open"></i>&nbsp;Status</span>
+                <select id="status" name="status"
+                        class="form-control" autocomplete="off"
+                        placeholder="Waiting for approval"
+                        {% if workorder.paid %}readonly{% endif %}>
+                        {% for status in ('Vélo reçu', 'À évaluer', 'Approuvé', 'Open', 'Finished', 'RDV') %}
+                          <option>{{status}}</option>
+                        {% endfor %}
+                </select>
+              </div>
+            </div>
+          </div>
+          <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                  $('#calendar_date').daterangepicker({
+                      singleDatePicker: true,
+                      showDropdowns: true,
+                      autoUpdateInput: true,
+                      timePicker: true,
+                      timePickerIncrement: 15,
+                      timePicker24Hour: true,
+                      locale: {
+                          format: 'YYYY-MM-DD HH:mm'
+                      }
+                  });
+              });
+          </script>
+
+          <div class="row">
+            <div class="col-4">
+              <label for="invoice_notes"><i class="far fa-eye"></i>&nbsp;Invoice notes <br> (<b>shown</b> on invoice)</label>
+              <textarea id="invoice_notes" name="invoice_notes" class="form-control"
+                        {% if workorder.client %}
+                          rows="5"
+                        {% else %}
+                          rows="2"
+                        {% endif %}
+                        {% if workorder.paid %}readonly{% endif %}
+                        >{{ workorder.invoice_notes }}</textarea>
+            </div>
+
+            <div class="col-8">
+              <label for="internal_notes"><i class="far fa-clipboard"></i>&nbsp;Internal notes <br> <small>(just for you)</small></label>
+              <textarea id="internal_notes" name="internal_notes" class="form-control"
+                        {% if workorder.client %}
+                          rows="5"
+                        {% else %}
+                          rows="2"
+                        {% endif %}
+                        {% if workorder.paid %}readonly{% endif %}
+                        >{{ workorder.internal_notes }}</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="row p-2 mb-5">
+        <h3 id="items" class="clearfix">
+          Items
+          <button id="btn-goto-total" class="btn btn-success float-right m-2 d-xl-none hidden" onclick="scrollto('#payment-block')">
+            <i class="fa fa-dollar-sign"></i> Total
+          </button>
+        </h3>
+
+        {% if not workorder.paid %}
+          <div class="input-group mb-3">
+            <span class="input-group-text"><i class="fa fa-plus-circle"></i>&nbsp;Add item</span>
+            <input id="new-item" type="text" class="form-control form-control-lg" autocomplete="off" placeholder="eg. Mise au point">
+          </div>
+
+          <div id="quick-items">
+            {% for item in quick_items %}
+              <button class="btn btn-outline-secondary btn-lg" onclick="new_row({{item | tojson | forceescape }})">
+                <i class="fa fa-plus-circle"></i> {{item.name}}
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <table id="table-items" class="table table-hover">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th style="width: 10%">Qty</th>
+              <th style="width: 25%">Price<!-- Taxable --></th>
+              <th style="width: 0"><!-- Actions --></th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+        </table>
+
+        {% if not workorder.paid and propose_membership %}
+          <div id="btn-add-membership" class="mt-5 text-center">
+            <button class="btn btn-warning" onclick="new_row({{ membership_item | tojson | forceescape }});">
+              {% if workorder.client.membership_paid_until is none %}
+                <i class="fa fa-plus-circle"></i> No DIY membership yet
+                <br>Click to add membership to this workorder
+              {% else %}
+                <i class="fa fa-plus-circle"></i> DIY membership ended on {{ workorder.client.membership_paid_until | humandate }}
+                <br>Click here to renew with workorder
+              {% endif %}
+            </button>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <div id="payment-block" class="col-xl-3 bg-dark p-3">
+      <div>
+        <h3 class="text-white">Total</h3>
+        <div class="mb-2">
+          <ul class="list-group">
+            <li class="list-group-item"><b>Subtotal</b>: <span id="subtotal"></span> $ <span id="discount-row" class="badge bg-success d-none">Discount applied: <span id="discount"></span> $</span></li>
+            <li class="list-group-item">
+                <b>Taxes</b>: <span id="taxes"></span>$
+                <br>
+                <div style="font-size: smaller" class="text-muted">
+                    <b>{{tax1_name}}</b>: <span id="taxes1"></span>$, <b>{{tax2_name}}</b>: <span id="taxes2"></span>$
+                </div>
+            </li>
+            <li style="font-size: larger" class="list-group-item list-group-item-primary">
+              <b>Total</b>: <span id="total"></span>$
+
+              {% if not workorder.paid %}
+                <button class="btn btn-outline-secondary btn-sm" onclick="alert('TODO : Ajuster le prix en calculant un rabais ou un don selon ce que la personne peut/veut payer')">
+                  <i class="fa fa-cog"></i>
+                </button>
+              {% endif %}
+            </li>
+          </ul>
+        </div>
+
+        <div class="text-white mt-5 clearfix">
+          {% if workorder.paid and workorder.transactions|length %}
+            <h3 class="text-white">Payments</h3>
+            <div class="mb-2">
+              {% for transaction in workorder.transactions %}
+                <span class="badge bg-success">
+                    {{ transaction.amount }} ({{ transaction.payment_method }})
+                    on {{ transaction.created | humandate }}
+                </span>
+                {% endfor %}
+            </div>
+            <button class="btn btn btn-danger"><i class="fa fa-undo"></i> Refund</button>
+          {% elif not workorder.paid %}
+            {# Note : a workorder can be "paid" without any transaction if its value is 0$ #}
+            <h4>Close order & pay</h4>
+            <div class="text-center">
+              <div class="btn-group">
+                <button class="btn btn-primary btn-lg">
+                  <i class="fa fa-money-bill-alt"></i>
+                  <br>Pay Cash
+                </button>
+                <button class="btn btn-success btn-lg">
+                  <i class="far fa-credit-card"></i>
+                  <br>Pay Debit
+                </button>
+              </div>
+              <br><br>
+              <div>
+                <button class="btn btn-danger">
+                  <i class="fab fa-cc-visa"></i> Pay VISA
+                </button>
+                <p><small>Avoid if possible &lt;3</small></p>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+      function use_last_bike(last_bike) {
+          // Set values + trigger .change() to save
+          $('#bike_description').val(last_bike.bike_description).change();
+          $('#bike_serial_number').val(last_bike.bike_serial_number).change();
+
+          $('#propose-use-last-bike').slideUp(300);
+      }
+
+      let order = {{ items | tojson }};
+
+      function load_order(items) {
+          items.forEach(item => load_row(item));
+
+          refresh_total();
+      }
+
+      function remove_item(btn) {
+          let $tr = $(btn).parentsUntil('tbody').last();
+
+          $.get('/api/delete-workorderitem/' + $tr.data('id'), function(data) {
+              $tr.remove();
+              refresh_total();
+          });
+      }
+
+      function enable_edit_item(btn) {
+          let $tr = $(btn).parentsUntil('tbody').last();
+
+          $('input', $tr).prop('readonly', false);
+          $('input[type="checkbox"]', $tr).onclick = "";
+      }
+
+      function load_row(item) {
+
+          $('#delete').remove();
+
+          {% if not workorder.paid %}
+          $('#btn-goto-total').removeClass('hidden');
+          {% endif %}
+
+          let row = '<tr>' +
+                    '  <td style="position: relative">' +
+                    '    <i style="position: absolute; left: 15px; top: 18px; opacity: 0.5" class="item-type fa"></i>' +
+                    '    <input name="name" type="text" class="form-control" style="padding-left: 35px" readonly />' +
+                    '    <a href="#none" class="refund d-none" style="position: absolute; right: 15px; top: 18px; opacity: 0.5">' +
+                    '      <i class="fa"></i>' +
+                    '    </a>' +
+                    '  </td>' +
+                    '  <td><input name="nb" type="number" class="form-control" step="0.01" readonly /></td>' +
+                    '  <td><div class="input-group">' +
+                    '    <input name="price" type="number" class="form-control" min="0" step="0.01" readonly />' +
+                    '    <a href="#none" class="input-group-text bg-primary text-white discount d-none">' +
+                    '        <i class="fa fa-tag"></i>' +
+                    '    </a>' +
+                    '    <label class="input-group-text">' +
+                    '      <input name="taxable" class="form-check-input mt-0"' +
+                    '             type="checkbox" onclick="return !$(this).prop(\'readonly\')" readonly /><small>+Tx</small>' +
+                    '    </label></div>' +
+                    '  </td>' +
+                    '  <td>' +
+                    '    <div class="btn-group">' +
+                    {% if not workorder.paid %}
+                    '      <button class="btn btn-danger" onclick="remove_item(this)">' +
+                    '        <i class="fa fa-trash-alt"></i>' +
+                    '      </button>' +
+                    '      <button class="btn btn-secondary" onclick="enable_edit_item(this)">' +
+                    '        <i class="fa fa-edit"></i>' +
+                    '      </button>' +
+                    {% endif %}
+                    '    </div>' +
+                    '  </td>' +
+                    '</tr>';
+          row = $(row);
+
+          let icons = {
+                    'labor': 'fa-user-clock',
+                    'article': 'fa-cogs',
+                    'other': 'fa-circle',
+          };
+          $('.item-type', row).addClass(icons[item.type]);
+          $('input[name="name"]', row).val(item.name);
+          $('input[name="nb"]', row).val(item.nb);
+          let $price = $('input[name="price"]', row);
+          $price.val(round(item.price));
+          $('input[name="taxable"]', row).attr('checked', item.taxable);
+
+          $('.discount', row).attr('title', 'Original price: ' + round(item.orig_price) + '$');
+          $('.discount', row).popover({trigger: 'focus'});
+
+          function href_workorder(id) {
+              return '<a href="/workorder/' + id + '">#' + id + '</a>';
+          }
+
+          if(item.refund_workorder_id) {
+              $('.refund i', row).addClass('fa fa-undo');
+              $('.refund i', row).css('color', 'green');
+              $('.refund', row).attr('title', 'Refunds ' + href_workorder(item.refund_workorder_id));
+              $('.refund', row).popover({trigger: 'focus', html: true});
+              $('.refund', row).removeClass('d-none');
+          } else if(item.refunded_in_workorder_id) {
+              $('.refund i', row).addClass('fa fa-redo');
+              $('.refund i', row).css('color', 'red');
+              $('input[name="name"]', row).css('text-decoration', 'line-through');
+              $('.refund', row).attr('title', 'Refunded by ' + href_workorder(item.refunded_in_workorder_id));
+              $('.refund', row).popover({trigger: 'focus', html: true});
+              $('.refund', row).removeClass('d-none');
+          }
+
+          function show_discount() {
+              $('.discount', row).removeClass('d-none');
+          }
+
+          function hide_discount() {
+              $('.discount', row).addClass('d-none');
+          }
+
+          if(item.orig_price != item.price) {
+              show_discount();
+          }
+
+          row.data('id', item.id);
+
+          $price.on('change', function() {
+              if(round(item.orig_price) != round($price.val())) {
+                  show_discount();
+              } else {
+                  hide_discount();
+              }
+          });
+
+          $('input', row).on('change', function() {
+              update_row_value(this);
+          });
+
+          $('#table-items').append(row);
+
+          // Animation pour donner le focus
+          row.css('opacity', 0);
+          row.animate({opacity: 1}, 1000);
+      }
+
+      function round(price) {
+          return (Math.round(price * 100) / 100).toFixed(2);
+      }
+
+      function refresh_total() {
+          $.get('/api/total/{{workorder.id}}', function(data) {
+              $('#subtotal').text(data.subtotal);
+
+              if(data.discount != 0) {
+                  $('#discount').text(data.discount);
+                  $('#discount-row').removeClass('d-none');
+              } else {
+                  $('#discount-row').addClass('d-none');
+              }
+
+              $('#taxes1').text(data.taxes1);
+              $('#taxes2').text(data.taxes2);
+              $('#taxes').text(data.taxes);
+              $('#total').text(data.total);
+          });
+      }
+
+      function scrollto(query) {
+          $('html,body').animate({scrollTop:$(query).offset().top}, 100);
+      }
+
+      function new_row(item) {
+          $.get('/api/add-item/{{workorder.id}}/' + item.id, function(data) {
+
+              if(item.id == {{ membership_item.id | tojson }})
+                  $('#btn-add-membership').slideUp();
+
+              load_row(data);
+
+              refresh_total();
+          });
+      }
+
+      function update_row_value(el) {
+          let row = $(el).parentsUntil('tbody').last();
+          let $input = $(el);
+          let name = $input.attr('name');
+          let value = $input.val();
+
+          if($input.attr('type') == 'checkbox')
+              value = +$input.prop('checked');
+
+          $.ajax('/api/edit/workorderitem/' + row.data('id'), {
+              data: JSON.stringify({
+                  column: name,
+                  value: value,
+              }),
+              contentType : 'application/json',
+              type: 'POST',
+              success: function() {
+                  refresh_total();
+
+                  // Success
+                  $input.addClass('is-valid');
+                  setTimeout(() => {
+                      $input.removeClass('is-valid')
+                  }, 2500);
+              }
+          });
+      }
+
+      // https://twitter.github.io/typeahead.js/examples/
+      document.addEventListener('DOMContentLoaded', function() {
+
+          $('#new-item').focus(function() {
+              scrollto('#new-item');
+          }).typeahead({
+              hint: true,
+              highlight: true,
+              minLength: 2
+          }, {
+              name: 'items',
+              display: 'name',
+              limit: 21,
+              source: function(query, syncResults, asyncResults) {
+                  $.get('/api/search/inventory_items/?query=' + query, function(data) {
+                      asyncResults(data);
+                  });
+              },
+              display: (e) => e.name,
+              templates: {
+                  notFound: '<div>Not found... Try other keywords</div>',
+                  {% raw %}
+                  suggestion: Handlebars.compile(
+                  '<div>' +
+                  '{{name}} ' +
+                  '<span class="badge bg-info debug">{{score}}</span>' +
+                  '<br>' +
+                  '<small class="text-muted"><b>{{category}}</b> {{subcategory}}</small>' +
+                  '</div>')
+                  {% endraw %}
+              }
+          }).bind('typeahead:select', function(ev, suggestion) {
+              new_row(suggestion);
+              $('#new-item').typeahead('val', '');
+          });
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+          load_order(order);
+      });
+  </script>
+
+  <style>
+      .refund {
+          color: red;
+      }
+      #workorder-title {
+          border-bottom: 1px solid #333;
+          padding-bottom: 5px;
+      }
+
+      #quick-items .btn {
+          margin-bottom: 5px;
+      }
+
+      .debug {
+          display: none;
+      }
+
+      .form-control[readonly] {
+          border: none;
+          background: none;
+      }
+
+      .form-control[readonly]::-webkit-outer-spin-button,
+      .form-control[readonly]::-webkit-inner-spin-button {
+          /* display: none; <- Crashes Chrome on hover */
+          -webkit-appearance: none;
+          margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+      }
+
+      .form-control[readonly]::placeholder {
+          color: transparent;
+      }
+
+      #client-editable-infos .readonly, #bike-editable-infos .readonly {
+          display: none;
+      }
+
+      #bike-editable-infos .form-control[readonly] {
+          border: 1px solid #CCC;
+          color: #555;
+      }
+
+      .form-control[readonly][type=number] {
+          -moz-appearance:textfield; /* Firefox */
+      }
+
+      /* Typeahead */
+      .tt-menu {
+          width: 800px;
+          left: -150px !important;
+      }
+
+      .tt-dataset-items {
+          display: flex !important;
+          flex-wrap: wrap;
+      }
+
+      .tt-dataset-items .tt-suggestion {
+          flex-basis: 32%;
+          border: 1px solid #e9ecef;
+          padding: 12px;
+          border-radius: 10px;
+          margin: 5px;
+      }
+  </style>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          $('#edit-paid-invoice').click(function() {
+              $(this).remove();
+              $('#bike-editable-infos [readonly]').each(function() {
+                  $(this).prop('readonly', false);
+              });
+
+              $('#bike-editable-infos .readonly, #client-editable-infos .readonly').each(function() {
+                  $(this).removeClass('readonly');
+              });
+
+          });
+
+          $('#bike-editable-infos input, #bike-editable-infos textarea').on('change', function() {
+              let $input = $(this);
+
+              let name = $input.attr('name');
+              let value = $input.val();
+
+              if(name == 'email_consent')
+                  value = +$input.prop('checked');
+
+              $.ajax('/api/edit/workorder/{{workorder.id}}', {
+                  data: JSON.stringify({
+                      column: name,
+                      value: value,
+                  }),
+                  contentType : 'application/json',
+                  type: 'POST',
+                  success: function() {
+                      $input.addClass('is-valid');
+                      setTimeout(() => {
+                          $input.removeClass('is-valid')
+                      }, 5000);
+                  }
+              });
+          });
+      });
+  </script>
+
+
+{% endblock %}

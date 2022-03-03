@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %} All clients {% endblock %}
+
+{% block content %}
+<div class="p3 row justify-content-md-center">
+    <!-- Duplicate Info -->
+    <div class="col-12">
+        <h1 class="text-success clearfix">Duplicate Info</h1>
+        <!-- <form action="" method="get" class="mt-5 mb-5">
+            <div class="input-group">
+                <input id="filter" name="query" class="form-control form-control-lg" placeholder="Search"
+                    value="{{query | forceescape}}">
+                <button class="input-group-btn btn btn-secondary" type="submit">See all results</button>
+            </div>
+        </form> -->
+
+        <div class="row mt-5">
+            <div class="col-sm-4">
+                <h1>Numbers</h1>
+                {% for client_phone in client_dup_phone %}
+                    {% for client in client_phone %}
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                        {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                        <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                        <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.phone }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4 ">
+                <h1>Emails</h1>
+                {% for client_email in client_dup_email %}
+                    {% for client in client_email %}
+
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                        {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                        <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                        <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.email }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4 mb-5">
+                <h1>Names</h1>
+                {% for client_name in client_dup_name %}
+                    {% for client in client_name %}
+
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                        {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                        <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                        <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.first_name }} {{ client.last_name }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+
+        <br>
+
+        
+    </div>
+
+    <!-- Erroneous Info -->
+    <div class="col-12">
+    <h1 class="text-success clearfix">Erreneous Info</h1>
+
+    <div class="row mt-5">
+        <div class="col-sm-4 mb-5">
+            <h1>At-sign</h1>
+            {% for clientPhone in clientDupPhone %}
+                {% for client in clientPhone %}
+                    <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {{client.first_name}} {{client.last_name}}
+                            </h5>
+                            <div class="float-right" style="opacity: 0.7">
+                                <small>
+                                    {% if client.membership_paid_until %}
+                                    {% if client.membership_paid_until is future %}
+                                    <span class="badge bg-success">Member</span>
+                                    {% elif client.membership_paid_until is past %}
+                                    <span class="badge bg-warning">Expired member</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <p class="mb-1 text-muted"><small>{{ client.phone }}</small></p>
+                    </a>
+                {% endfor %}
+                <br>
+            {% endfor %}
+        </div>
+        <div class="col-sm-4 mb-3">
+            <h1>Names</h1>
+            {% for client in missing_names %}
+                <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            {{client.first_name}} {{client.last_name}}
+                        </h5>
+                        <div class="float-right" style="opacity: 0.7">
+                            <small>
+                                {% if client.membership_paid_until %}
+                                {% if client.membership_paid_until is future %}
+                                <span class="badge bg-success">Member</span>
+                                {% elif client.membership_paid_until is past %}
+                                <span class="badge bg-warning">Expired member</span>
+                                {% endif %}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    {% if client.first_name == '' %}
+                    <p class="mb-1 text-muted"><small>First name missing</small></p>
+                    {% elif client.membership_paid_until is past %}
+                    <p class="mb-1 text-muted"><small>Last name missing</small></p>
+                    {% endif %}
+
+                </a>
+            {% endfor %}
+        </div>
+        <div class="col-sm-4 mb-5">
+            <h1>Names</h1>
+            {% for clientName in clientDupName %}
+                {% for client in clientName %}
+
+                    <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {{client.first_name}} {{client.last_name}}
+                            </h5>
+                            <div class="float-right" style="opacity: 0.7">
+                                <small>
+                                    {% if client.membership_paid_until %}
+                                    {% if client.membership_paid_until is future %}
+                                    <span class="badge bg-success">Member</span>
+                                    {% elif client.membership_paid_until is past %}
+                                    <span class="badge bg-warning">Expired member</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        <p class="mb-1 text-muted"><small>{{ client.first_name }} {{ client.last_name }}</small></p>
+                    </a>
+                {% endfor %}
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+
+        
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('#filter').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        }, {
+            name: 'clients',
+            source: function (query, syncResults, asyncResults) {
+                $.get('/api/search/clients/?query=' + query, function (data) {
+                    asyncResults(data);
+                });
+            },
+            limit: 10,
+            display: (e) => e.first_name + ' ' + e.last_name,
+            templates: {
+                {% raw %}
+                suggestion: Handlebars.compile(
+                '<div><a class="list-group-item list-group-item-action" href="/client/{{id}}">' +
+                '{{first_name}} {{last_name}}' +
+                '<br>' +
+                '<small class="text-muted">{{phone}}</small>' +
+                '</a></div>'),
+        {% endraw %}
+            }
+        });
+    });
+</script>
+{% endblock content %}

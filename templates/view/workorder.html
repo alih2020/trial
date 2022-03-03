@@ -1,0 +1,23 @@
+<a href="/workorder/{{workorder.id}}" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+        <div class="col-9">
+            <h5 class="mb-1">{{workorder.bike_description or ('&nbsp;'|safe)}}</h5>
+        </div>
+        <div class="col-3 text-right">
+            <small class="text-muted">
+                {% if workorder.paid %}
+                <span class="badge bg-success">Paid</span>
+                {% endif %}
+                {{ workorder.client.name() if workorder.client else ('<i>Direct sale</i>'|safe) }}
+            </small>
+        </div>
+    </div>
+    <div class="row mb-1">
+        <div class="col-8">
+            {{workorder.invoice_notes|truncate(100) or ('&nbsp;'|safe)}}
+        </div>
+        <div class="col-4 text-right">
+            <small>{{workorder.calendar_date|humandate("%d %b %Y %H:%M")}}</small>
+        </div>
+    </div>
+</a>
