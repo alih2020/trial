@@ -1,0 +1,147 @@
+*Issues are now located here* : https://gitlab.com/316k/minipos/-/issues
+
+
+* Misc
+**Bold** items necessary for a minimum viable product
+
+- [X] **Organize .py files in a flask project**
+  - Follow https://charlesleifer.com/blog/structuring-flask-apps-a-how-to-for-those-coming-from-django/
+
+- [X] **Protect with password**
+  - Stay logged in
+- [X] /clients/
+  - [X] Typeahead : full search (spellfix) if no results
+  - [X] Postal code -> display region
+
+- [-] Workorders
+  - [X] Add/delete workorder_items
+  - [X] Fix prices
+  - [X] Compute/update workorder total + taxes
+  - [X] Change client/set client/set direct sale
+  - [X] Show workorders by generic datetime (appointment/received/...)
+    - [X] Small "calendar" (lines grouped by day, with hour)
+  - [-] **Payments**
+    - [X] Basic payments
+    - [ ] Multiple transactions for a single payment
+    - [ ] **Cash rounding**
+
+  - [ ] Receipts
+    - [ ] Print receipt
+    - [ ] Send receipt by email
+
+  - [ ] **Refunds**
+    - [ ] New workorder with negative number of refunded elements (ex.: -1 tire)
+  - [ ] **Various Status (open, finished and paid, waiting for approval, ...)**
+  - [ ] Apply membership(s) on invoice payment
+  - [ ] Figure a non-wobbly way of having "on sale" bikes (status?)
+  - [ ] "always_edit_line" on some workorderitems (Donation/Hour of DIY)
+
+- [ ] Taxes are hard
+  - **Tax rate per item**
+  - There are a lot of unsupported use cases here
+  - For now, items are either taxed or untaxed, but the real world is
+    far more complex :
+    - Clients in other parts of the world are not subject to all taxes
+    - There is a legal distinction between "no tax" and 0% tax
+    - https://www.lapresse.ca/affaires/finances-personnelles/201604/28/01-4975947-les-de-taxes.php
+    - https://ici.radio-canada.ca/tele/la-facture/site/segments/reportage/199628/amazon-livre-taxes-tps-tvq-tvh-numerique
+      - Au Québec, la vente de livres comportant un ISBN est
+        généralement « détaxée ». Ce terme signifie que la vente est
+        taxable, mais que le taux de la TVQ est ramené dans ce cas-ci
+        à 0 % au lieu du 9,975 % habituel.
+
+- [-] Items
+  - [X] Rename TemplateItem as InventoryItem
+  - [X] Items can be either Labour or Article
+  - [-] Simple non-intrusive "inventory" field to keep count since
+    last time (admin only)
+    - [X] Field in InventoryItem
+    - [ ] **Recently sold stats** (in a custom time period) instead of
+      keeping track of the initial quantity
+    - +[ ] **Auto-decrement on invoice paid**+ (maybe later)
+    - [ ] Admin view of inventory
+
+- [-] Clients
+  - [X] Add year of birth
+  - [ ] Credit in store (for cash deposits, and other things)
+  - [ ] Import Type/Discount category
+- [ ] Reports & stats
+- [X] Config file
+  - [X] Don't hardcode taxes
+    - [X] Save taxes amount with each paid invoice
+    - [X] Configure taxes in config.py (changes rarely, but does)
+- [X] Propose bike description from last Workorder for existing
+  clients
+
+- [ ] **Uniform way to manage "disabled" items**
+
+- [X] Avoid duplicating the total computation in frontend/backend :
+  +all /api/ edit calls should return infos about the total+ total
+  infos are fetched through /api/total/<workorder_id>
+
+- [-] There will be maaaaaaany products with the same name
+  - [X] Search by exact SKU
+  - [ ] Category buttons for the Workorder
+
+- [ ] **Fix IPad display when there's a big on-screen keyboard**
+
+- [ ] **Cash Register close**
+
+- [ ] Reduce the number of fields during Direct sales (maybe collapse
+  in an accordion?)
+
+- [ ] New client : alert if there is already a client with the same
+  phone number or name during typing
+
+- Tags system for the workorders
+  - Kanban board style view
+
+- Quick-select Categories for the items
+
+- Database cleanup tool
+  - Merge duplicate clients
+
+- Validate HTML on mobile version
+
+* Reports
+
+- What's useful to know?
+  - List payments per type (visa/debit/cash)
+  - List of clients who consent to receive emails
+  - Number of clients per region (postal code)
+  - Number of sold items with filter per category + date start + date
+    end
+
+* Nice to have
+- [X] flash() instead of custom notifications : https://flask.palletsprojects.com/en/2.0.x/patterns/flashing/
+
+- [ ] Localize
+
+- [ ] Database cleanup tool
+  - Merge duplicate clients
+    - duplicate full name or phone
+  - @ in a non-email field
+  - Empty first/last names
+  - Suspicious date of birth (less than 3yo or in the future)
+  - Wrong postal code : if not re.search(r'^[hH]\d[a-zA-Z] ?\d[a-zA-Z]\d$', get('postal code'))
+
+- [ ] On login redirect, save the current url
+  - eg.: logout after a certain timeout, click on /workorder/2, the
+    next redirect points to /
+
+- [ ] How to handle an empty invoice?
+  - Add a Quick way to delete it
+
+- [ ] All workorders vs Older jobs confusion
+
+- Find a clean way to add customized code extensions to avoid bulding
+  custom specifications into the core
+  - Membership logic
+  - "Bike" labels
+  - Bikes on sale
+
+- [X] Send invoice by email
+  - Flask-Mail + gmail address, or maybe SendGrid
+  - Test it with something like https://mailtrap.io/
+
+- [ ] Send email notification when something goes wrong (?)

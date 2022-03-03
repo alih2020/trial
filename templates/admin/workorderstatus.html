@@ -1,0 +1,238 @@
+{% extends "admin/base.html" %}
+
+{% block title %} Customize status {% endblock %}
+
+{% block head %}
+  <script src="/static/js/jquery-3.6.0.min.js"></script>
+  <script src="/static/js/jquery-ui.min.js"></script>
+  <script src="/static/js/fontawesome.all.min.js"></script>
+  <link href="/static/css/fontawesome.all.min.css" rel="stylesheet">
+  <!-- https://github.com/furf/jquery-ui-touch-punch -->
+  <script src="/static/js/jquery.ui.touch-punch.min.js"></script>
+{% endblock head %}
+
+{% block body %}
+<div class="p3 row justify-content-center">
+
+  <div class="col-12 container">
+    <h1 class="mb-5">Customize Workorder Statuses</h1>
+    <div class="row">
+      <div class="col-sm-6 col-lg-5 mb-5">
+        <h3>Statuses</h3>
+        <ol id="statusList" class="list-group list-group-flush status-list">
+          {% for status in statuses %}
+            <li class="list-group-item .list-group-item-action cursor-pointer" data-index="{{status.display_order}}">
+              <span class="badge" style="color: white; font-size: large; background-color: {{status.color}}">{{ status }}</span>
+            </li>
+          {% endfor %}
+        </ol>
+        <button id="newStatus" class="btn btn-outline-primary btn-block mt-4" onclick="switchToCreate()"><i
+            class="fas fa-plus-circle"></i>
+          New</button>
+      </div>
+      <div id="statusInputs" class="col mt-2">
+        <form id="statusForm" action="" method="POST">
+          <div class="row mb-3">
+            <div class="col">
+              <label for="name">Name</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-comment-dots"></i></span>
+                <input id="name" name="name" type="text" class="form-control" value="" required />
+              </div>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="col-12">
+              <label for="color">Color</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="fas fa-palette"></i></span>
+                <input id="color" name="color" type="color" class="form-control" value="" required />
+              </div>
+            </div>
+          </div>
+        </form>
+        <div class="row mt-5 mb-4">
+          <div class="col">
+            <button id="save" class="btn btn-primary btn-block" form="statusForm">
+              <i class="fas fa-save"></i><span> Create</span>
+            </button>
+            <button id="archive" class="btn btn-danger btn-block invisible">
+              <i class="fas fa-archive"></i><span> Archive</span>
+            </button>
+            <div id="statusAlert" class="alert alert-success mt-5" role="alert" style="display: none;">
+              Status successfully <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let statuses = {{ workorderstatuses | tojson }};
+    $('#statusList li').mouseup(mouseUp);
+
+    function mouseUp() {
+      $this = $(this);
+      if (!$this.hasClass('ui-sortable-helper')) {
+        switchToEdit()
+
+        $('#statusList li').each(function () {
+          $(this).removeClass('active')
+        })
+        $this.addClass('active')
+
+        index = $this.data('index')
+        $("#name").val(statuses[index].name)
+        $("#color").val(statuses[index].color)
+        $("#save, #archive").val(index)
+      }
+    }
+
+    function switchToEdit() {
+      if ($("#archive").hasClass("invisible")) {
+        $("#archive").removeClass("invisible");
+        $('#save span').text(' Save');
+        $('#save').removeClass('btn-primary')
+        $('#save').addClass('btn-success')
+      }
+    }
+
+    function removeStatus(index) {
+      $('#statusList li').each(function () {
+        if ($(this).data('index') == index) {
+          $(this).remove()
+          delete statuses[index]
+        }
+      })
+    }
+
+    function switchToCreate() {
+
+      let $activeItems = $('#statusList li.active')
+
+      if($activeItems.length) {
+        $activeItems.each(function () {
+          $(this).removeClass('active')
+        })
+      } else {
+        // Re-clicking on "New" should trigger some visual feedback
+        $('#name').css({backgroundColor: '#FFEF9A'})
+        setTimeout(() => $('#name').css({backgroundColor: 'transparent'}), 1500)
+      }
+
+      $("#archive").addClass("invisible");
+      $('#save span').text(' Create');
+      $('#save').removeClass('btn-success')
+      $('#save').addClass('btn-primary')
+
+      $("#name").val('')
+      $("#color").val('')
+      $("#save, #archive").val('')
+    }
+
+    $("#statusForm").submit(function (e) {
+      e.preventDefault()
+      let index = $("#save").val()
+
+      msg = {
+        name: $("#name").val(),
+        color: $("#color").val(),
+      }
+
+      if (index.length > 0) {
+        msg.id = statuses[index].id
+      }
+
+
+      $.post('./api/status/', msg, function (data) {
+        if (msg.id == undefined) {
+          $("#statusAlert span").text('created')
+          statuses.push(data);
+          switchToEdit();
+          $("#save, #archive").val(statuses.length - 1);
+          $("#statusList").append('<li class="list-group-item .list-group-item-action cursor-pointer active"' +
+                                  `data-index="${statuses.length - 1}">` +
+                                  `<span class="badge" style="color: white; font-size: large; background-color: ${data.color}">` +
+                                  data.name +
+                                  '</span>' +
+                                  '</li>');
+          $('#statusList li').mouseup(mouseUp);
+        } else {
+          $("#statusAlert span").text('updated')
+          statuses[index] = data
+          $('#statusList li').each(function () {
+            if ($(this).data('index') == index) {
+              $('.badge', this).text(msg.name);
+              $('.badge', this).css({backgroundColor: msg.color});
+            }
+          })
+        }
+
+        $("#statusAlert").fadeIn(500, function () {
+          setTimeout(function(){
+            $("#statusAlert").fadeOut(500);
+          }, 1500)
+        });
+      });
+    })
+
+    $("#archive").on('click', function () {
+      if (confirm("Archive this status?")) {
+        let index = $(this).val();
+
+        msg = {
+          statusId: statuses[index].id,
+          archived: true
+        }
+        $.post('./api/status/', msg, function (data) {
+          if (data) {
+            switchToCreate();
+            removeStatus(index);
+          }
+        })
+      }
+    })
+
+    $('.status-list').sortable({
+      revert: 200,
+      distance: 10,
+
+      start: function (event, ui) {
+      },
+
+      stop: function (event, ui) {
+        statusIds = []
+        $('#statusList li').each(function () {
+          index = $(this).data('index')
+          statusIds.push(statuses[index].id);
+        })
+
+        msg = {
+          ids: JSON.stringify({
+            status_ids: statusIds,
+          })
+        }
+
+
+        $.post('./api/status/', msg, function (data) {
+        });
+      }
+    });
+  </script>
+
+  <style>
+    .list-group-item.active {
+        background-color: #DDD;
+        border: none;
+    }
+
+    .cursor-pointer {
+      cursor: pointer;
+    }
+  </style>
+</div>
+{% endblock body %}

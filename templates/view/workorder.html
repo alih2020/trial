@@ -1,0 +1,24 @@
+<a href="/workorder/{{workorder.id}}" class="list-group-item list-group-item-action">
+    <div class="d-flex w-100 justify-content-between">
+        <div class="col-9">
+            <h5 class="mb-1">{{ workorder.client.name() if workorder.client else ('<i>Direct sale</i>'|safe) }}</h5>
+        </div>
+        <div class="col-3 text-right">
+            <small class="text-muted">
+                {% if workorder.paid %}
+                  <span class="badge bg-success">Paid</span>
+                {% endif %}
+                <span class="badge" style="background-color: {{ workorder.status.color }};">{{ workorder.status }}</span>
+            </small>
+        </div>
+    </div>
+    <div class="row mb-1">
+        <div class="col-8">
+            {{(workorder.bike_description + '\n' + workorder.invoice_notes)|truncate(100)|trim or ('&nbsp;'|safe)}}
+        </div>
+        <div class="col-4 text-right">
+            <!-- TODO : Find a nice way to choose what to print here -->
+            {{workorder.calendar_date|humandate("%d %b %Y %H:%M")}} <br> {{workorder.total() | format_currency }}
+        </div>
+    </div>
+</a>

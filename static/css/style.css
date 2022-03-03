@@ -1,0 +1,21 @@
+.home-btn {
+    font-size: large;
+    line-height: 2.75;
+    max-width: 100%;
+}
+
+input[type="checkbox"].is-valid + span {
+    color: green;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.float-right {
+    float: right;
+}
+
+.hidden {
+    display: none;
+}

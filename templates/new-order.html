@@ -1,0 +1,65 @@
+<h2><i class="fa fa-plus-circle"></i> New workorder</h2>
+
+<div class="col-sm-10 mt-3">
+    <div class="btn-group" style="width: 100%">
+        <a href="/client/new/" class="btn home-btn btn-primary" style="width: 50%">
+            <i class="fa fa-user-plus"></i> New client
+        </a><a href="/workorder/new/direct" class="btn home-btn btn-secondary" style="width: 50%">
+            <i class="fa fa-dollar-sign"></i> Direct sale
+        </a>
+    </div>
+
+    <br><br>
+
+    <label for="client" class="btn home-btn btn-success" onclick="highlight_client()" style="width: 100%">
+        <i class="fa fa-user"></i> Already Client
+    </label>
+    <br><br>
+    <div class="input-group mb-3">
+        <span class="input-group-text"><i class="fa fa-user"></i>&nbsp;Name</span>
+        <input id="client" type="text" class="form-control form-control-lg">
+    </div>
+</div>
+
+<script>
+    function highlight_client() {
+        $('#client').css({backgroundColor: '#FFEF9A'});
+
+        setTimeout(() => $('#client').css({backgroundColor: 'white'}), 1500);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        $('#client').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 2
+        }, {
+            name: 'clients',
+            source: function(query, syncResults, asyncResults) {
+                $.get('/api/search/clients/?query=' + query, function(data) {
+                    asyncResults(data);
+                });
+            },
+            limit: 10,
+            display: (e) => e.first_name + ' ' + e.last_name,
+            templates: {
+                {% raw %}
+                suggestion: Handlebars.compile(
+                    '<div><a class="list-group-item list-group-item-action" href="/workorder/new/{{id}}">' +
+                    '{{first_name}} {{last_name}}' +
+                    '<br>' +
+                    '<small class="text-muted">{{phone}}</small>' +
+                    '</a></div>'),
+                {% endraw %}
+                footer: '<div class="tt-suggestion"><a class="list-group-item list-group-item-action" href="/client/new/">' +
+                        '<i>New client</i>' +
+                        '</a></div>',
+                notFound: '<div class="tt-suggestion"><a class="list-group-item list-group-item-action" href="/client/new/">' +
+                          '<i>New client</i>' +
+                          '</a></div>',
+            }
+        }).bind('typeahead:select', function(ev, suggestion) {
+            window.location = '/workorder/new/' + suggestion.id;
+        });
+    });
+</script>

@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+
+{% block title %} Reports -
+  {% if date_start and date_end %}
+    From {{ date_start }} to {{ date_end }}
+  {% elif date_start %}
+    Everything from {{ date_start }}
+  {% elif date_end %}
+    Everything until {{ date_end }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+  <div class="row">
+    <div class="col-lg-8">
+      <h2>Sales</h2>
+
+      <div class="row mt-3 mb-3">
+        <div class="col-sm-3">
+          <label>Shows sales for : </label>
+        </div>
+
+        <div class="col-sm-9">
+          <div id="reportrange"
+               class="form-control">
+               <i class="fa fa-calendar"></i>&nbsp;
+               <span></span> <i class="fa fa-caret-down"></i>
+          </div>
+        </div>
+      </div>
+
+      <script type="text/javascript">
+          document.addEventListener('DOMContentLoaded', function () {
+              let ranges = {
+                  // Hong kong style, +100 years
+                  'Last year': [moment().subtract(1, 'years'), moment()],
+                  'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                  'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                  'This Month': [moment().startOf('month'), moment().endOf('month')],
+                  'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                  'All time': [moment().subtract(100, 'years'), moment().add(100, 'years')],
+              };
+
+              let start = moment("{{ date_start }}");
+              let end = moment("{{ date_end }}");
+
+              let label = start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY');
+
+              for (let predef_label in ranges) {
+                  console.log(predef_label)
+                  console.log(start.diff(ranges[predef_label][0], 'days'));
+                  console.log(end.diff(ranges[predef_label][1], 'days'));
+
+                  if (start.diff(ranges[predef_label][0], 'days') == 0 &&
+                      end.diff(ranges[predef_label][1], 'days') == 0) {
+                      label = predef_label;
+                      break;
+                  }
+              }
+
+              $('#reportrange span').text(label);
+
+              function submit(start, end) {
+                  window.location = '?date_start=' + start.format('YYYY-MM-DD') + '&date_end=' + end.format('YYYY-MM-DD');
+              }
+
+              $('#reportrange').daterangepicker({
+                  startDate: start,
+                  endDate: end,
+                  ranges: ranges
+              }, submit);
+          });
+      </script>
+
+      <div>
+        <p style="font-size: larger">
+          <b>Profits</b> (todo)$
+          <small class="text-muted">Subtotal minus costs</small>
+        </p>
+
+        <p>
+          <b>Subtotal</b> {{ workorder_stats.subtotal | format_currency }}
+          <small class="text-muted">All sales before taxes (including discounts)</small>
+        </p>
+        <p>
+          <b>Total</b> {{ workorder_stats.total | format_currency }}
+          <small class="text-muted">Final amount paid by customers</small>
+        </p>
+        <p>
+          <b>{{tax1_name}} </b> {{ workorder_stats.taxes1 | format_currency }}
+          <small class="text-muted">Current rate: {{ (tax1_rate * 100).normalize() }}%</small>
+        </p>
+        <p>
+          <b>{{tax2_name}} </b>{{ workorder_stats.taxes2 | format_currency }}
+          <small class="text-muted">Current rate: {{ (tax2_rate * 100).normalize() }}%</small>
+        </p>
+        <p>
+          <b>Total of taxes</b> {{ workorder_stats.taxes | format_currency }}
+          <small class="text-muted">Combined rate: {{ ((tax1_rate + tax2_rate) * 100).normalize() }}%</small>
+        </p>
+        <p>
+          <b>Discounts applied</b> {{ workorder_stats.total_discounts | format_currency }}
+          <br>
+          <small class="text-muted">A discount is automatically identified when an
+              item is sold at a price <u>lower than</u> its regular selling price.
+              Items sold for a higher price than usual (eg.: a donation from a generous
+              customer) are not included here.</small>
+        </p>
+      </div>
+
+      <div class="mt-5">
+        <h4>Number of sales per item <button class="btn btn-sm btn-secondary" onclick="alert('Not available yet')">Export CSV</button> </h4>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Item</th>
+              <th scope="col">Sold</th>
+            </tr>
+            </thead>
+            <tbody>
+              {% for item in items_sold %}
+                <tr>
+                  <td>{{item.name}}</td>
+                  <td>{{item.total_sold}}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+
+        <script type="text/javascript">
+            $(function () {
+                $(".table").tablesorter();
+            });
+        </script>
+
+        <style>
+            .tablesorter-headerUnSorted div::after {
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                content: " \f0dc";
+            }
+
+            .tablesorter-headerAsc div::after {
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                content: " \f0dd";
+            }
+
+            .tablesorter-headerDesc div::after {
+                font-family: "Font Awesome 5 Free";
+                font-weight: 900;
+                content: " \f0de";
+            }
+        </style>
+      </div>
+    </div>
+
+    <div class="col-lg-4 bg-light p-2">
+      <h2>Customers</h2>
+
+      <canvas id="postal-codes-piechart" width="400" height="300"></canvas>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('postal-codes-piechart').getContext('2d');
+
+        const DATA_COUNT = {{ postal_codes_keys | length }};
+
+        const colors = Array(DATA_COUNT).fill(0).map((val, i) => {
+            return 'hsl(' + i / DATA_COUNT * 360 + ', 70%, 50%)';
+        });
+
+        const data = {
+            labels: {{ postal_codes_keys | tojson }},
+            datasets: [
+                {
+                    data: {{ postal_codes_vals | tojson }},
+                    backgroundColor: colors,
+                }
+            ]
+        };
+
+        const config = {
+            type: 'pie',
+            data: data,
+            plugins: [ChartDataLabels],
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Postal codes'
+                    },
+                    // https://stackoverflow.com/a/52044118/14639652
+                    datalabels: {
+                        formatter: (value, ctx) => {
+                            let sum = 0;
+                            let dataArr = ctx.chart.data.datasets[0].data;
+                            dataArr.map(data => {
+                                sum += data;
+                            });
+                            let percentage = (value*100 / sum).toFixed(2)+"%";
+                            return percentage;
+                        },
+                        color: '#fff',
+                    }
+                }
+            },
+        };
+
+        const myChart = new Chart(ctx, config);
+    </script>
+  </div>
+{% endblock %}

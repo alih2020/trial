@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="p3 row">
+    <div class="col-sm-6">
+      {% include "new-order.html" %}
+    </div>
+    <div class="col">
+        <h2><i class="fa fa-calendar"></i> Calendar</h2>
+
+        <div class="list-group">
+          {% for gr, workorders in open_workorders|groupby("group") %}
+            <div class="{% if gr == today %}today{% endif %}">
+              <h5 class="calendar-date">{{ gr | humandate("%d %b") }}</h5>
+              {% for workorder in workorders %}
+                {% include "view/workorder.html" %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="list-group-item list-group-item-action p-4">
+              <div class="d-flex w-100 justify-content-between">
+                <h4 class="mb-1">All done, go grab a coffee <i class="fa fa-coffee"></i></h4>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <p style="text-align: right" class="p-2">
+            <a href="/workorders/" class="link-secondary">See older jobs</a>
+        </p>
+    </div>
+  </div>
+
+  <div class="mb-3" style="opacity: 0.7">
+      <h3>Recently paid</h3>
+      {% for workorder in recent_workorders %}
+        {% include "view/workorder.html" %}
+      {% endfor %}
+  </div>
+
+  <style>
+      h5.calendar-date {
+        margin-bottom: 0;
+        background: #add8e678;
+        padding: 8px;
+      }
+      .today h5.calendar-date {
+          font-weight: bold;
+      }
+      .today {
+          border: 1px solid blue;
+      }
+  </style>
+{% endblock %}

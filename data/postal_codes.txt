@@ -1,0 +1,180 @@
+H0A Non assigné
+H0B Non assigné
+H0C Non assigné
+H0E Non assigné
+H0G Non assigné
+H0H Réservé - (Père Noël)
+H0J Non assigné
+H0K Non assigné
+H0L Non assigné
+H0M Région d'Akwesasne - (Akwesasne)
+H0N Non assigné
+H0P Non assigné
+H0R Non assigné
+H0S Non assigné
+H0T Non assigné
+H0V Non assigné
+H0W Non assigné
+H0X Non assigné
+H0Y Non assigné
+H0Z Non assigné
+H1A Pointe-aux-Trembles
+H1B Montréal-Est
+H1C Rivière-des-Prairies - Nord-est
+H1E Rivière-des-Prairies - Sud-ouest
+H1G Montréal-Nord - Est
+H1H Montréal-Nord - Ouest
+H1J Anjou - Nord
+H1K Anjou - Sud
+H1L Mercier-Est - Sud
+H1M Mercier-Ouest - Nord
+H1N Mercier-Ouest - Sud
+H1P Saint-Léonard - Nord
+H1R Saint-Léonard - Ouest
+H1S Saint-Léonard - Sud-est
+H1T Rosemont - Nord
+H1V Maisonneuve
+H1W Hochelaga - 
+H1X Rosemont - Centre
+H1Y Rosemont - Sud
+H1Z Saint-Michel - Ouest
+H2A Saint-Michel - Est
+H2B Ahuntsic - Nord-est
+H2C Ahuntsic - Nord
+H2E Villeray - Nord-est
+H2G Petite-Patrie - Nord-est
+H2H Plateau Mont-Royal - Est
+H2J Plateau Mont-Royal - Centre
+H2K Centre-Sud - Nord
+H2L Centre-Sud - Sud
+H2M Ahuntsic - Est
+H2N Ahuntsic - Sud-est
+H2P Villeray - Ouest
+H2R Villeray - Sud-est
+H2S Petite-Patrie - Sud-ouest
+H2T Plateau Mont-Royal - Ouest
+H2V Outremont
+H2W Plateau Mont-Royal - Sud Centre
+H2X Plateau Mont-Royal - Sud-est
+H2Y Vieux-Montréal
+H2Z Centre-ville de Montréal - Nord-est
+H3A Centre-ville de Montréal - Nord (Université McGill)
+H3B Centre-ville de Montréal - Est
+H3C Griffintown1 - (Incluant Île Notre-Dame & Île Sainte-Hélène)
+H3E Île des Sœurs
+H3G Centre-ville de Montréal - Sud-est (Université Concordia)
+H3H Centre-ville de Montréal - Sud-ouest
+H3J Petite-Bourgogne
+H3K Pointe Saint-Charles
+H3L Ahuntsic - Sud-ouest
+H3M Cartierville - Nord-est
+H3N Parc-Extension
+H3P Mont-Royal - Nord
+H3R Mont-Royal - Centre
+H3S Côte-des-Neiges - Nord
+H3T Côte-des-Neiges - Nord-est
+H3V Côte-des-Neiges - Est
+H3W Côte-des-Neiges - Sud-ouest
+H3X Hampstead - 
+H3Y Westmount - Nord
+H3Z Westmount - Sud
+H4A Notre-Dame-de-Grâce - Nord-est
+H4B Notre-Dame-de-Grâce - Sud-ouest
+H4C Saint-Henri
+H4E Ville Émard
+H4G Verdun - Nord
+H4H Verdun - Sud
+H4J Cartierville - Centre
+H4K Cartierville - Sud-ouest
+H4L Saint-Laurent - Intérieur Nord-est
+H4M Saint-Laurent - Est
+H4N Saint-Laurent - Extérieur Nord-est
+H4P Mont-Royal - Sud
+H4R Saint-Laurent - Centre
+H4S Saint-Laurent - Sud-ouest
+H4T Saint-Laurent - Sud-est
+H4V Côte-Saint-Luc - Est
+H4W Côte-Saint-Luc - Ouest
+H4X Montréal-Ouest
+H4Y Dorval - Centre (YUL)
+H4Z Tour de la Bourse
+H5A Place Bonaventure
+H5B Complexe Desjardins
+H5C Non assigné
+H5E Non assigné
+H5G Non assigné
+H5H Non assigné
+H5J Non assigné
+H5K Non assigné
+H5L Non assigné
+H5M Non assigné
+H5N Non assigné
+H5P Non assigné
+H5R Non assigné
+H5S Non assigné
+H5T Non assigné
+H5V Non assigné
+H5W Non assigné
+H5X Non assigné
+H5Y Non assigné
+H5Z Non assigné
+H7A Duvernay-Est
+H7B Saint-François
+H7C Saint-Vincent-de-Paul
+H7E Duvernay
+H7G Pont-Viau
+H7H Auteuil - Ouest
+H7J Auteuil - Nord-est
+H7K Auteuil - Sud
+H7L Sainte-Rose
+H7M Vimont
+H7N Laval-des-Rapides
+H7P Fabreville
+H7R Laval-sur-le-Lac
+H7S Chomedey - Nord-est
+H7T Chomedey - Nord-ouest
+H7V Chomedey - Est
+H7W Chomedey - Sud
+H7X Sainte-Dorothée
+H7Y Îles-Laval
+H7Z Non assigné
+H8A Non assigné
+H8B Non assigné
+H8C Non assigné
+H8E Non assigné
+H8G Non assigné
+H8H Non assigné
+H8J Non assigné
+H8K Non assigné
+H8L Non assigné
+H8M Non assigné
+H8N LaSalle - Nord-ouest
+H8P LaSalle - Sud-est
+H8R Ville Saint-Pierre
+H8S Lachine - Est
+H8T Lachine - Ouest
+H8V Non assigné
+H8W Non assigné
+H8X Non assigné
+H8Y Roxboro
+H8Z Pierrefonds - Nord
+H9A Dollard-Des-Ormeaux - Nord-ouest
+H9B Dollard-Des-Ormeaux - Est
+H9C L'Île-Bizard - Est
+H9E L'Île-Bizard - Ouest
+H9G Dollard-Des-Ormeaux - Sud-ouest
+H9H Sainte-Geneviève - Pierrefonds Centre
+H9J Kirkland Pierrefonds - Centre
+H9K Senneville
+H9L Non assigné
+H9M Non assigné
+H9N Non assigné
+H9P Dorval - Extérieur
+H9R Pointe-Claire
+H9S L'Île-Dorval Dorval - Sud Pointe-Claire Sud
+H9T Non assigné
+H9V Non assigné
+H9W Beaconsfield
+H9X Sainte-Anne-de-Bellevue - Baie-d'Urfé - Senneville
+H9Y Non assigné
+H9Z Non assigné

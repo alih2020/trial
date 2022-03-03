@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %} DEBUG {% endblock %}
+
+{% block content %}
+
+<div style="text-align: center; font-size: large; margin-top: 150px">
+    <pre>{{dump | pprint}}</pre>
+</div>
+
+{% endblock %}

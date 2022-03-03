@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %} Cash Register {% endblock %}
+
+{% block content %}
+<div class="p3 row justify-content-center">
+
+  <div class="col-9 container">
+    <form id="cash-form" action="/cash-register/" method="post">
+      <div class="row">
+        <h1 class="text-success clearfix">Cash Register Close</h1>
+        <p>Last close : {{ date }}</p>
+
+        <div class="col-12 col-md-5 mt-4">
+          <h2 class="text-primary">Recorded amounts</h2>
+          <p>This is what the point of sale recorded</p>
+          {% for method in payment_methods.keys() %}
+          <div class="mb-4">
+            <h4>{{method.capitalize()}} : {{ payment_methods[method] | format_currency }}</h4>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="col mt-4">
+          <h2 class="text-primary">Actual amounts</h2>
+          <p>Write down what you counted</p>
+          {% for method in payment_methods.keys() %}
+            <div class="mb-2">
+              <h4>{{method.capitalize()}}</h4><input class="form-control" name="{{method}}" type="number" step="0.01" required>
+            </div>
+          {% endfor %}
+
+          <br>
+
+          <h4>Notes <small>(optional)</small></h4>
+          <textarea class="form-control" name="comment" id="cash-notes" rows="5"
+                    placeholder="eg.: Human error during workorder #728, not enough change given back"></textarea>
+
+          <br>
+
+          <h4>Cash Fund</h4>
+          <p>How much cash is left in the register as cash fund</p>
+          <input type="number" step="0.01" name="cash_fund" id="" min="0" class="form-control" required>
+
+          <button id="submit" class="btn btn-primary mt-4 mb-4"><i class="fas fa-file-invoice-dollar"></i> Close
+            Register
+          </button>
+        </div>
+      </div>
+    </form>
+
+
+    <form id="cash-form" action="/cash-register/" method="post">
+      <div class="row mt-5">
+        <h1 class="text-success clearfix">Cash Deposit or Withdrawal</h1>
+
+        <div class="col-6 col-md-4 mt-2">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="deposit" id="deposit" value="desposit" required>
+            <label class="form-check-label" for="deposit">
+              <h5>Deposit</h5>
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="deposit" id="withdrawal" value="withdrawal">
+            <label class="form-check-label" for="withdrawal">
+             <h5>Withdrawal</h5>
+            </label>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-8">
+          <h4>Amount</h4>
+          <input type="number" step="0.01" name="amount" id="" class="form-control" min="0" required>
+        </div>
+
+        <div class="col-12 mt-3">
+          <h4>Notes</h4>
+          <textarea class="form-control" name="comment" id="cash-notes" cols="30" rows="5" required></textarea>
+        </div>
+        <button id="submit" class="btn btn-success mt-4 mb-4">
+            <i class="fas fa-coins"></i> Create Transaction
+        </button>
+      </div>
+    </form>
+  </div>
+
+
+</div>
+{% endblock content %}
