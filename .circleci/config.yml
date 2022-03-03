@@ -30,7 +30,7 @@ jobs:
          name: Execute part 5
          command: echo "DEBUG = False" >> config.py
       - run:
-         name: Execute part 6   
+         name: Tests
          command: python -m pytest
 
           
