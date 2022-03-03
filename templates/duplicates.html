@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %} Duplicates clients {% endblock %}
+
+{% block content %}
+<div class="p3 row justify-content-md-center">
+
+    <div class="col-12">
+        <h1 class="text-success clearfix">Duplicate Info</h1>
+
+        <div class="row mt-5">
+            <div class="col-sm-4">
+                <h2>Same phone numbers</h2>
+                {% for label, duplicates in client_dup_phone %}
+                    {% for client in duplicates %}
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                      {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                          <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                          <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                      {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.phone }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4 ">
+                <h2>Same emails</h2>
+                {% for label, duplicates in client_dup_email %}
+                    {% for client in duplicates %}
+
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                      {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                          <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                          <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                      {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.email }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="col-sm-4 mb-5">
+                <h2>Same full names</h2>
+                {% for label, duplicates in client_dup_name %}
+                    {% for client in duplicates %}
+                        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">
+                                    {{client.first_name}} {{client.last_name}}
+                                </h5>
+                                <div class="float-right" style="opacity: 0.7">
+                                    <small>
+                                      {% if client.membership_paid_until %}
+                                        {% if client.membership_paid_until is future %}
+                                          <span class="badge bg-success">Member</span>
+                                        {% elif client.membership_paid_until is past %}
+                                          <span class="badge bg-warning">Expired member</span>
+                                        {% endif %}
+                                      {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            <p class="mb-1 text-muted"><small>{{ client.phone }}</small></p>
+                        </a>
+                    {% endfor %}
+                    <br>
+                {% endfor %}
+            </div>
+        </div>
+        <br>
+    </div>
+
+    <!-- Erroneous Info -->
+    <div class="col-12">
+    <h1 class="text-success clearfix">Erroneous Info</h1>
+
+    <div class="row mt-5">
+        <div class="col-sm-4 mb-5">
+            <h2>Suspicious symbols</h2>
+            {% for client in wrong_character %}
+                <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            {{client.first_name}} {{client.last_name}}
+                        </h5>
+                        <div class="float-right" style="opacity: 0.7">
+                            <small>
+                                {% if client.membership_paid_until %}
+                                {% if client.membership_paid_until is future %}
+                                <span class="badge bg-success">Member</span>
+                                {% elif client.membership_paid_until is past %}
+                                <span class="badge bg-warning">Expired member</span>
+                                {% endif %}
+                                {% endif %}
+                            </small>
+                        </div>
+                    </div>
+                    <p class="mb-1 text-muted"><small>{{ client.email }}</small></p>
+                </a>
+            {% endfor %}
+
+        </div>
+        <div class="col-sm-4 mb-3">
+            <h2>Incomplete names</h2>
+                {% for client in missing_names %}
+                    <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">
+                                {{client.first_name}} {{client.last_name}}
+                            </h5>
+                            <div class="float-right" style="opacity: 0.7">
+                                <small>
+                                  {% if client.membership_paid_until %}
+                                    {% if client.membership_paid_until is future %}
+                                      <span class="badge bg-success">Member</span>
+                                    {% elif client.membership_paid_until is past %}
+                                      <span class="badge bg-warning">Expired member</span>
+                                    {% endif %}
+                                  {% endif %}
+                                </small>
+                            </div>
+                        </div>
+                        {% if client.first_name == '' %}
+                          <p class="mb-1 text-muted"><small>First name missing</small></p>
+                        {% endif %}
+                        {% if client.last_name == '' %}
+                          <p class="mb-1 text-muted"><small>Last name missing</small></p>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+        </div>
+        <div class="col-sm-4 mb-5">
+            <h2>Suspicious birth date</h2>
+            {% for client in suspicious_date %}
+                <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">
+                            {{client.first_name}} {{client.last_name}}
+                        </h5>
+                        <div class="float-right" style="opacity: 0.7">
+                          <small>
+                            {% if client.membership_paid_until %}
+                              {% if client.membership_paid_until is future %}
+                                <span class="badge bg-success">Member</span>
+                              {% elif client.membership_paid_until is past %}
+                                <span class="badge bg-warning">Expired member</span>
+                              {% endif %}
+                            {% endif %}
+                          </small>
+                        </div>
+                    </div>
+                    <p class="mb-1 text-muted"><small>Year of birth: {{ client.year_of_birth }}</small></p>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    </div>
+</div>
+{% endblock content %}

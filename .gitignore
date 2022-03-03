@@ -1,0 +1,7 @@
+venv
+__pycache__
+database.db*
+config.py
+TODO-local.org
+anonymized-database.db
+.coverage

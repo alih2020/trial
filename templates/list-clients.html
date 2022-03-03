@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %} All clients {% endblock %}
+
+{% block content %}
+  <div class="p3 row justify-content-md-center">
+    <div class="col-6">
+      <h3 class="text-success mb-4 clearfix">
+        {% if query %}
+          Clients for "{{query}}"
+        {% else %}
+          All clients
+        {% endif %}
+        <a href="/client/new/" class="btn btn-primary float-right">
+          <i class="fa fa-plus-circle"></i> New client
+        </a>
+      </h3>
+
+      <form action="" method="get" class="mt-5 mb-5">
+        <div class="input-group">
+          <input id="filter" name="query" class="form-control form-control-lg" placeholder="Search" value="{{query | forceescape}}">
+          <button class="input-group-btn btn btn-secondary" type="submit">See all results</button>
+        </div>
+      </form>
+
+      {% for client in clients %}
+        <a href="/client/{{client.id}}" class="list-group-item list-group-item-action">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">
+              {{client.first_name}} {{client.last_name}}
+            </h5>
+            <div class="float-right" style="opacity: 0.7">
+              <small>
+                {% if client.membership_paid_until %}
+                  {% if client.membership_paid_until is future %}
+                    <span class="badge bg-success">Member</span>
+                  {% elif client.membership_paid_until is past %}
+                    <span class="badge bg-warning">Expired member</span>
+                  {% endif %}
+                {% endif %}
+              </small>
+            </div>
+          </div>
+          <p class="mb-1 text-muted"><small>{{ client.phone }}</small></p>
+        </a>
+      {% endfor %}
+
+      <br>
+
+      <div class="text-center">
+        <nav>
+          <ul class="pagination">
+            {% if page - 1 >= 1 %}
+              <li class="page-item"><a class="page-link" href="{{ url_for('list_clients', query=query, page=page - 1) }}">Previous</a></li>
+            {% endif %}
+
+            {% for delta in range(3, 0, -1) %}
+              {% if page - delta >= 1 %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('list_clients', query=query, page=page - delta) }}">{{page - delta}}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            <li class="page-item active"><span class="page-link" href="#">{{page}}</span></li>
+
+            {% for delta in range(1, 4) %}
+              {% if page + delta <= total_pages %}
+                <li class="page-item"><a class="page-link" href="{{ url_for('list_clients', query=query, page=page + delta) }}">{{page + delta}}</a></li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page + 1 <= total_pages %}
+              <li class="page-item"><a class="page-link" href="{{ url_for('list_clients', query=query, page=page + 1) }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('#filter').typeahead({
+            hint: true,
+            highlight: true,
+            minLength: 1
+        }, {
+            name: 'clients',
+            source: function(query, syncResults, asyncResults) {
+                $.get('/api/search/clients/?query=' + query, function(data) {
+                    asyncResults(data);
+                });
+            },
+            limit: 10,
+            display: (e) => e.first_name + ' ' + e.last_name,
+            templates: {
+                {% raw %}
+                suggestion: Handlebars.compile(
+                    '<div><a class="list-group-item list-group-item-action" href="/client/{{id}}">' +
+                    '{{first_name}} {{last_name}}' +
+                    '<br>' +
+                    '<small class="text-muted">{{phone}}</small>' +
+                    '</a></div>'),
+                {% endraw %}
+            }
+        });
+    });
+  </script>
+{% endblock content %}

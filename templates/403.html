@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %} 403 - Forbidden - {% endblock %}
+
+{% block content %}
+
+<div style="text-align: center; font-size: large; margin-top: 150px">
+    {% if e %}
+      <h2>{{e}}</h2>
+    {% else %}
+      <h2>Forbidden action</h2>
+    {% endif %}
+
+    <p>If you see this error, please report it to your admin.</p>
+
+    <br>
+
+    <p><a class="btn btn-primary btn-lg" href="/">
+        <i class="fa fa-home"></i> Go back home
+    </a></p>
+</div>
+
+{% endblock content %}
