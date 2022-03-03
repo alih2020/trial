@@ -13,16 +13,11 @@ jobs:
     # Add steps to the job
     # See: https://circleci.com/docs/2.0/configuration-reference/#steps
     steps:
-      - checkout:
-          test:
+      - checkout
       - run:
          name: Execute
          command: pip install -r requirements.txt
-                  cp config.example.py config.py
-                  echo "SECRET_KEY = 'Test secret key'" >> config.py
-                  echo "SECURITY_PASSWORD_SALT = 'Test password salt'" >> config.py
-                  echo "DEBUG = False" >> config.py
-                  pytest
+          
 
 
 # Invoke jobs via workflows
