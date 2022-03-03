@@ -17,6 +17,22 @@ jobs:
       - run:
          name: Execute
          command: pip install -r requirements.txt
+      - run:
+         name: Execute part 2
+         command: cp config.example.py config.py
+      - run:
+         name: Execute part 3
+         command: echo "SECRET_KEY = 'Test secret key'" >> config.py
+      - run:
+         name: Execute part 4
+         command: echo "SECURITY_PASSWORD_SALT = 'Test password salt'" >> config.py
+      - run:
+         name: Execute part 5
+         command: echo "DEBUG = False" >> config.py
+      - run:
+         name: Execute part 6   
+         command: pytest
+
           
 
 
