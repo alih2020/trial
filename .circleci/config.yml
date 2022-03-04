@@ -32,6 +32,10 @@ jobs:
       - run:
          name: Tests
          command: python -m pytest
+      - run:
+         name: JavaDoc
+         command: pydoc
+
 
           
 
